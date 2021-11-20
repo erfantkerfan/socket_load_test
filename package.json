@@ -1,0 +1,24 @@
+{
+  "name": "socket_load_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "load-test" : "npm run build && node ./dist/load-test.js",
+    "build": "rimraf ./dist && tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tsconfig/node16": "^1.0.2",
+    "rimraf": "^3.0.2",
+    "socket.io-client": "^4.4.0",
+    "typescript": "^4.5.2",
+    "yargs": "^17.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.9",
+    "@types/yargs": "^17.0.7"
+  }
+}
