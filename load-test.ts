@@ -3,7 +3,7 @@ import yargs from 'yargs';
 
 yargs(process.argv.slice(2)).command('*', '', {
     'address': {
-        alias:'a',
+        alias: 'a',
         type: 'string'
     },
     'max_client': {
@@ -33,6 +33,7 @@ yargs(process.argv.slice(2)).command('*', '', {
     let clientCount = 0;
     let lastReport = new Date().getTime();
     let packetsSinceLastReport = 0;
+    let disCount = 0;
 
     const createClient = () => {
         // for demonstration purposes, some clients stay stuck in HTTP long-polling
@@ -44,9 +45,9 @@ yargs(process.argv.slice(2)).command('*', '', {
         });
 
         setInterval(() => {
-            socket.emit("clientMessage",{
-                message:'new event',
-                socket:socket.id
+            socket.emit("clientMessage", {
+                message: 'new event',
+                socket: socket.id
             });
         }, EMIT_INTERVAL_IN_MS);
 
@@ -56,6 +57,7 @@ yargs(process.argv.slice(2)).command('*', '', {
 
         socket.on("disconnect", (reason) => {
             console.log(`disconnect due to ${reason}`);
+            disCount++;
         });
 
 
@@ -74,9 +76,8 @@ yargs(process.argv.slice(2)).command('*', '', {
         ).toFixed(2);
 
         console.log(
-            `[${(new Date()).toTimeString()}] client count: ${clientCount} ; average packets received per second: ${packetsPerSeconds}`
+            `[${(new Date()).toTimeString()}] client count:${clientCount}; average packets received per second:${packetsPerSeconds}; disconnect count: ${disCount}`
         );
-
         packetsSinceLastReport = 0;
         lastReport = now;
     };
