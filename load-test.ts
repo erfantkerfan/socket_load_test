@@ -25,10 +25,10 @@ yargs(process.argv.slice(2)).command('*', '', {
 }, argv => {
 
     const URL = argv.address as string;
-    const MAX_CLIENTS = argv.max_client as number;
-    const POLLING_PERCENTAGE = argv.polling_percentage as number;
-    const CLIENT_CREATION_INTERVAL_IN_MS = argv.client_creation_interval;
-    const EMIT_INTERVAL_IN_MS = argv.emit_message_interval;
+    const MAX_CLIENTS = argv.max_client as number || 5;
+    const POLLING_PERCENTAGE = (argv.polling_percentage as number) / 100 || 0.01;
+    const CLIENT_CREATION_INTERVAL_IN_MS = argv.client_creation_interval || 10;
+    const EMIT_INTERVAL_IN_MS = argv.emit_message_interval || 4000;
 
     let clientCount = 0;
     let lastReport = new Date().getTime();
@@ -42,24 +42,35 @@ yargs(process.argv.slice(2)).command('*', '', {
 
         const socket = io(URL, {
             transports,
+            auth: {
+                token: '12321',
+                examId: '129387192839'
+            }
         });
 
         setInterval(() => {
-            socket.emit("clientMessage", {
+            socket.emit("pingServer", {
                 message: 'new event',
                 socket: socket.id
             });
         }, EMIT_INTERVAL_IN_MS);
 
-        socket.on("serverMessage", (msg) => {
+        socket.on("messageChannel", (msg) => {
             packetsSinceLastReport++;
         });
+
+        socket.on('question.file-link:update', (msg) => {
+            console.log('got new link', msg)
+        })
+
+        socket.on(`newConnection`,(msg)=>{
+            console.log(msg)
+        })
 
         socket.on("disconnect", (reason) => {
             console.log(`disconnect due to ${reason}`);
             disCount++;
         });
-
 
         if (++clientCount < MAX_CLIENTS) {
             setTimeout(createClient, CLIENT_CREATION_INTERVAL_IN_MS);
